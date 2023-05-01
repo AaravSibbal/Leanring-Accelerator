@@ -1,13 +1,11 @@
-//here play the definition that we have
 let play = false
 function handlePlayBtn(){
-    print("play: "+play)
     togglePlay()
     if(play === false){
         playBtn.innerHTML = "Pause"
-        folder = getFolder()
+        let folder = getFolder()
         for(let i=0; i<folder.definitions.length; i++){
-            txt = folder.definitions[i]
+            let txt = folder.definitions[i]
             speak(txt)
         }
     }
@@ -33,11 +31,16 @@ function handlePrevBtn(){
 function handleNextBtn(){
 
 }
-function playerIsLive(){
-    folder = getFolder()
-    if(folder.definitions.length >= 0){
+function toggleMediaPlayer(){
+    let folder = getFolder()
+    if(folder.definitions.length > 0){
         playBtn.disabled = false
         nextBtn.disabled = false
         prevBtn.disabled = false
+    }
+    else{
+        playBtn.disabled = true
+        nextBtn.disabled = true
+        prevBtn.disabled = true
     }
 }
