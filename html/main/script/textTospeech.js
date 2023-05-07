@@ -1,3 +1,5 @@
+const speechSynthesis = window.speechSynthesis;
+
 function getVoices() {
     let voices = speechSynthesis.getVoices();
     if(!voices.length){
@@ -21,7 +23,7 @@ function speak(text, voice= getVoices()[0], rate=1, pitch=1, volume=1) {
     
     // pass the SpeechSynthesisUtterance to speechSynthesis.speak to start speaking 
     speechSynthesis.speak(speakData);
-  
+    playIsOver()//just setting everything to normal again
 }
 
 

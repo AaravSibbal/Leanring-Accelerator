@@ -28,7 +28,7 @@ document.onkeydown = function(e){
     
     if(e.key === "Enter"){
         if(submitBtn.disabled === false){
-            handleSubmit()
+            handleSubmit()//handles if we are inside a folder or not
             
         }
     }
@@ -191,6 +191,8 @@ function handleFolderRemoveButton(folderName){
     changingTheList()
 }
 
+// this is that there is no space in the folder names 
+//the reason that I use the names as the id's for the list element
 function changingTheFolderName(str){
     let idx = str.indexOf(" ")
     if(idx === -1){

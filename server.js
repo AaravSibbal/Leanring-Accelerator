@@ -5,8 +5,11 @@ const fs = require('fs') //need to read static files
 const url = require('url')  //to parse url strings
 const { json } = require('express')
 
+const loginURLS = ['/login.js','/loginHandler.js','/login.css','/loginUser.js','login.html' ]
+const signupURLS = ['/signup.js','/signupHandler.js','/signup.css','/signupUser.js','signup.html' ]
 
-const ROOT_DIR = 'html/main' //dir to serve static files from
+const mainURLS = ["/script/index.js","/script/eventHandler.js","/script/mediaPlayer.js","/script/textToSpeech.js","/script/user.js","/style.css"]
+const ROOT_DIR = 'html' //dir to serve static files from
 
 const MIME_TYPES = {
     'css': 'text/css',
@@ -78,6 +81,33 @@ http.createServer(function (request,response){
             response.end(JSON.stringify(returnObj));
             
         }
+
+        // recieved data object: username, password
+        if(request.method === "POST" && urlObj.pathname === "/checkUser"){
+            dataObj = JSON.parse(recievedData)
+
+            //TODO: add a check here for if we have the data
+            returnObj = {isValid: true};// chenge the true to a function call to the server
+            console.log("this is responseJSON: "+returnObj)
+            response.writeHead(200, {
+                "Content-type": MIME_TYPES["json"]
+            })
+            response.end(JSON.stringify(returnObj));
+            
+        }
+
+        if(request.method === "POST" && urlObj.pathname === "/createUser"){
+            dataObj = JSON.parse(recievedData)
+
+            //TODO: add a check here for if we have the data
+            returnObj = {isValid: true};// chenge the true to a function call to the server
+            console.log("this is responseJSON: "+returnObj)
+            response.writeHead(200, {
+                "Content-type": MIME_TYPES["json"]
+            })
+            response.end(JSON.stringify(returnObj));
+            
+        }
         if(request.method ==="POST" && urlObj.pathname === "/deleteFolder"){
             dataObj = JSON.parse(recievedData)
             let userData = {}
@@ -95,7 +125,17 @@ http.createServer(function (request,response){
 
         if(request.method === "GET"){
             let filePath = ROOT_DIR + urlObj.pathname
-            if(urlObj.pathname === '/') filePath = ROOT_DIR + '/index.html'
+            if(loginURLS.includes(urlObj.pathname)){
+                filePath = ROOT_DIR + "/login" + urlObj.pathname
+            }
+            if(mainURLS.includes(urlObj.pathname)){
+                filePath = ROOT_DIR + "/main" + urlObj.pathname
+            }
+            if(signupURLS.includes(urlObj.pathname)){
+                filePath = ROOT_DIR + "/signup" + urlObj.pathname
+            }
+            if(urlObj.pathname === '/') filePath = ROOT_DIR + '/signup/signup.html'
+            console.log("FILE PATH REQUSTED: "+ filePath)
 
             fs.readFile(filePath, function(err,data){
                 if(err){
@@ -115,4 +155,4 @@ http.createServer(function (request,response){
 
 console.log('Server Running at Port 3000  CNTL-C to quit')
 console.log('To Test:')
-console.log('http://localhost:8080/login/login.html')
+console.log('http://localhost:3000/login/login.html')
