@@ -1,22 +1,20 @@
-const userData = require("/user.ts")
-const media = require("/mediaPlayer")
 
 
 
-export const textField = (document.getElementById("text-field") as HTMLTextAreaElement)
-export const submitBtn = ((document.getElementById("submit-btn")) as HTMLButtonElement)
-export const list = ((document.getElementById("list")) as HTMLUListElement)
-export const backBtn = ((document.getElementById("back-btn")) as HTMLButtonElement)
-export const instrucPara = ((document.getElementById("instructions")) as HTMLParagraphElement)
-export const fileSelector = ((document.getElementById("file-selector")) as HTMLInputElement)
-export const playBtn = ((document.getElementById("play-btn")) as HTMLButtonElement)
-export const prevBtn = ((document.getElementById("prev-btn")) as HTMLButtonElement)
-export const nextBtn = ((document.getElementById("next-btn")) as HTMLButtonElement)
+const textField = (document.getElementById("text-field"))
+const submitBtn = document.getElementById("submit-btn")
+const list = document.getElementById("list")
+const backBtn = document.getElementById("back-btn")
+const instrucPara = document.getElementById("instructions")
+const fileSelector = document.getElementById("file-selector")
+const playBtn = document.getElementById("play-btn")
+const prevBtn = document.getElementById("prev-btn")
+const nextBtn = document.getElementById("next-btn")
 
 
 
 window.onload = ()=>{
-    ((fileSelector) as HTMLButtonElement).disabled = true;
+    ((fileSelector)).disabled = true;
     
 }
 
@@ -26,11 +24,11 @@ document.onkeyup = function() {
         submitBtn.disabled = false;
     }
 }
-document.onkeydown = function(e: KeyboardEvent){
+document.onkeydown = function(e){
     
     if(e.key === "Enter"){
         if(submitBtn.disabled === false){
-            handleSubmit()
+            handleSubmit()//handles if we are inside a folder or not
             
         }
     }
@@ -43,7 +41,7 @@ document.onkeydown = function(e: KeyboardEvent){
 function changingTheList(){
     //if we are inside a folder get the information inside te folder and 
     //put it in the list
-    if(userData.isInsideAFolder){
+    if(user.isInsideAFolder){
         let folder = getFolder()
         let len = folder.definitions.length
         
@@ -72,8 +70,8 @@ function changingTheList(){
     }
     else{
         list.innerHTML = ""
-        for(let i=0; i<userData.user.folderNames.length; i++){
-            let folderName = userData.user.folderNames[i]
+        for(let i=0; i<user.folderNames.length; i++){
+            let folderName = user.folderNames[i]
             let listElem = document.createElement("li")
             let folderBtn = createButtonHTML(folderName, folderName)
             let removeFolderBtn = createButtonHTML("-", `r_${folderName}`)
@@ -87,33 +85,29 @@ function changingTheList(){
 }
 
 
-export function handleFolderButton(folderName: string){
+function handleFolderButton(folderName){
 
     
-    let isFolderEmpty
     instrucPara.innerHTML = "Please use the following format while adding the definition:\n"+
                                 "name: and here the explanation"
-    userData.isInsideAFolder = true
+    user.isInsideAFolder = true
     fileSelector.disabled = false
-    userData.user.currDir = folderName
+    user.currDir = folderName
     submitBtn.innerHTML = "Add Definition"
     backBtn.disabled = false
     let folder = getFolder()
     if(folder.definitions.length === 0){
         instrucPara.innerHTML += "\n There is no definition you can use yet please add to continue"
-        isFolderEmpty = true
     }
-    else{
-        isFolderEmpty = false
-    }
+    
         
     changingTheList()
     
 
 
 }
-export function handleBackBtn(){
-    userData.isInsideAFolder = false
+function handleBackBtn(){
+    user.isInsideAFolder = false
     changingTheList()
     submitBtn.innerHTML = "Create Folder"
     instrucPara.innerHTML = ""
@@ -123,9 +117,9 @@ export function handleBackBtn(){
  * 
  * @returns a folder object with definitions
  */
-export function getFolder(){
-    let idx = userData.user.folderNames.indexOf(userData.user.currDir)
-    return userData.user.folders[idx]
+function getFolder(){
+    let idx = user.folderNames.indexOf(user.currDir)
+    return user.folders[idx]
 }
 
 /**
@@ -134,8 +128,8 @@ export function getFolder(){
  * in an array and then just put that array values in to make a track
  * list
  */
-export function handleFile(event){
-    let userRequestJSON: any;
+function handleFile(event){
+    let userRequestJSON;
     userRequestJSON = {text: ""};
     let input = event.target
     let textResult
@@ -143,7 +137,6 @@ export function handleFile(event){
     let reader = new FileReader();
     reader.onload = function(){
       textResult = reader.result;
-      textResult = textResult.trim()
       userRequestJSON.text = textResult
       userRequestJSON = JSON.stringify(userRequestJSON)
       let xhttp = new XMLHttpRequest()
@@ -158,7 +151,7 @@ export function handleFile(event){
                 }
               }
               changingTheList()
-              console.log(userData.user)
+              console.log(user)
           }
           
       }
@@ -170,11 +163,11 @@ export function handleFile(event){
     
 }
 
-export function handleFolderRemoveButton(folderName: string){
-    let userRequestJSON: any;
+function handleFolderRemoveButton(folderName){
+    let userRequestJSON;
     userRequestJSON = {
-        folderID: userData.user.folderID,
-        userID: userData.user.userID,
+        folderID: user.folderID,
+        userID: user.userID,
         folder_Name: folderName
     };
     userRequestJSON = JSON.stringify(userRequestJSON)
@@ -182,21 +175,25 @@ export function handleFolderRemoveButton(folderName: string){
     xhttp.onreadystatechange= ()=>{
         if(xhttp.readyState == 4 && xhttp.status == 200){
             //then do nothing because it is done lol
+            let responseObj = JSON.parse(xhttp.responseText)
+            console.log(responseObj)
         }
         
     }
     xhttp.open("POST", "deleteFolder")
     xhttp.send(userRequestJSON)
     
-    let idx = userData.user.folderNames.indexOf(folderName)
+    let idx = user.folderNames.indexOf(folderName)
 
     //changing the foldernammes arr and the folders arr
-    userData.user.folderNames.splice(idx, 1)
-    userData.user.folders.splice(idx, 1)
+    user.folderNames.splice(idx, 1)
+    user.folders.splice(idx, 1)
     changingTheList()
 }
 
-function changingTheFolderName(str: string){
+// this is that there is no space in the folder names 
+//the reason that I use the names as the id's for the list element
+function changingTheFolderName(str){
     let idx = str.indexOf(" ")
     if(idx === -1){
         //the world is good 
@@ -214,19 +211,18 @@ function changingTheFolderName(str: string){
     }
 }
 
-export function handleRemoveDef(event: any & {target: HTMLButtonElement}){
+function handleRemoveDef(event){
     let id = event.target.id // get the id of the button element 
-    let idx: string | number = id.split("-")[1]//because the way id is made foldername-index in the definitions
+    let idx = id.split("-")[1]//because the way id is made foldername-index in the definitions
     idx = Number(idx)
     let btn = document.getElementById(id) //getting to use the button element
     if(btn !== null){
-        let parent = btn.parentElement  //because this is in the list element getting the list element
         let folder = getFolder()
 
         //changing the defninitions folders arr
         folder.definitions.splice(idx, 1)
         changingTheList()  
-        media.playerIsLive()
+        toggleMediaPlayer()
         
     }
     
@@ -237,48 +233,34 @@ export function handleRemoveDef(event: any & {target: HTMLButtonElement}){
  * setting it's id
  * and naming the button
  */
-function createButtonHTML(value: string, id: string){
+function createButtonHTML(value, id){
     let btn = document.createElement("button")
     btn.setAttribute("id", `${id}`)
     btn.innerText = value
     return btn
 }
 
-export function handleSubmit(){
+function handleSubmit(){
     /**
      * create a folder if the name is unique
      * also add an event handler with the same name because 
      * the name is already unique 
      * 
      */
-    if(!userData.isInsideAFolder){
+    if(!user.isInsideAFolder){
         let folderName = textField.value
-        let folderNameIdx = userData.user.folderNames.indexOf(folderName)
+        let folderNameIdx = user.folderNames.indexOf(folderName)
         if(folderNameIdx === -1){
             folderName = changingTheFolderName(folderName)
-            let folder = {
+            let folder= {
                 name: folderName,
                 definitions: []
             }
-            userData.user.folders.push(folder)
-            userData.user.folderNames.push(folderName)
-            let folderLI = document.createElement("li")//creating the list element
-
-            let folderBtn = createButtonHTML(folderName, folderName)
-            
-            /**
-             * creating the remove folder button
-             * setting it's id
-             * adding the value to it
-             */
-            let remFolderBtn = createButtonHTML("-", `r_${folderName}`)
-            folderLI.appendChild(folderBtn)
-            folderLI.appendChild(remFolderBtn)
-            list.appendChild(folderLI)
-            addingTheEventListener(folderName)
-
+            user.folders.push(folder)
+            user.folderNames.push(folderName)
+            changingTheList()
             textField.value = ""
-            
+            submitBtn.disabled = true;
     
         }
         else{
@@ -291,32 +273,14 @@ export function handleSubmit(){
      */
     else{
         let folder = getFolder()
-
         let txt = textField.value
         txt = txt.trim()
         textField.value = ""
-        /**
-         * here the way id is set up is by making use of the definition lengths
-         * and when you add each you just take the index of the definition to 
-         * make a unique id but this is only because we are adding the definitions 
-         * one at a time here and there is no need to over complicate this
-         * 
-         * also now that I am using the create element I think it is working better 
-         * 
-         */
         if(txt !== ""){
             folder.definitions.push(txt)
-            let idx= folder.definitions.length-1
-            let id = `${folder.name}-${folder.definitions.length-1}` 
-            let remDefBtn = createButtonHTML("-", id)
-            let listElem = document.createElement("li")
-            listElem.innerText = `${txt}`
-            listElem.setAttribute("id", `li-${id}`)
-            listElem.appendChild(remDefBtn)
-            list.appendChild(listElem)
-            addingTheRemoveDefEvent(id)
-            media.playerIsLive()
+            changingTheList()//this just renders the list again
         }
+        toggleMediaPlayer()
         
     }
     

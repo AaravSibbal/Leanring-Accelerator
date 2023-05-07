@@ -1,7 +1,9 @@
 things to do:
 
 questions for me:
-how will I relay the information about the user login in the 
+how will I relay the information about the user login
+the answer is just by changing the root directory
+when you post the request
 
 
 
