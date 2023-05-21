@@ -1,6 +1,3 @@
-
-
-
 const textField = (document.getElementById("text-field"))
 const submitBtn = document.getElementById("submit-btn")
 const list = document.getElementById("list")
@@ -166,9 +163,8 @@ function handleFile(event){
 function handleFolderRemoveButton(folderName){
     let userRequestJSON;
     userRequestJSON = {
-        folderID: user.folderID,
-        userID: user.userID,
-        folder_Name: folderName
+        folderName: user.currDir,
+        userEmail: user.userEmail,
     };
     userRequestJSON = JSON.stringify(userRequestJSON)
     let xhttp = new XMLHttpRequest()
@@ -212,12 +208,13 @@ function changingTheFolderName(str){
 }
 
 function handleRemoveDef(event){
+    let folder
     let id = event.target.id // get the id of the button element 
     let idx = id.split("-")[1]//because the way id is made foldername-index in the definitions
     idx = Number(idx)
     let btn = document.getElementById(id) //getting to use the button element
     if(btn !== null){
-        let folder = getFolder()
+        folder = getFolder()
 
         //changing the defninitions folders arr
         folder.definitions.splice(idx, 1)
@@ -225,6 +222,25 @@ function handleRemoveDef(event){
         toggleMediaPlayer()
         
     }
+    let userRequestJSON;
+    userRequestJSON = {
+        folderName: user.currDir,
+        userEmail: user.userEmail,
+        definition: user.currDir.definitions[idx]
+    };
+    userRequestJSON = JSON.stringify(userRequestJSON)
+    let xhttp = new XMLHttpRequest()
+    xhttp.onreadystatechange= ()=>{
+        if(xhttp.readyState == 4 && xhttp.status == 200){
+            //then do nothing because it is done lol
+            let responseObj = JSON.parse(xhttp.responseText)
+            console.log(responseObj.text)
+        }
+        
+    }
+    xhttp.open("POST", "deleteDefinition")
+    xhttp.send(userRequestJSON)
+    
     
 }
 
@@ -261,7 +277,25 @@ function handleSubmit(){
             changingTheList()
             textField.value = ""
             submitBtn.disabled = true;
-    
+            
+            let userRequestJSON;
+            userRequestJSON = {
+                folderName: textField.value,
+                userEmail: user.userEmail,
+            };
+            userRequestJSON = JSON.stringify(userRequestJSON)
+            let xhttp = new XMLHttpRequest()
+            xhttp.onreadystatechange= ()=>{
+                if(xhttp.readyState == 4 && xhttp.status == 200){
+                    //then do nothing because it is done lol
+                    let responseObj = JSON.parse(xhttp.responseText)
+                    console.log(responseObj.text)
+                }
+                
+            }
+            xhttp.open("POST", "addFolder")
+            xhttp.send(userRequestJSON)
+            
         }
         else{
             alert("Folder already exists")
@@ -281,7 +315,24 @@ function handleSubmit(){
             changingTheList()//this just renders the list again
         }
         toggleMediaPlayer()
-        
+        let userRequestJSON;
+        userRequestJSON = {
+            folderName: user.currDir,
+            userEmail: user.userEmail,
+            definition: textField.value
+        };
+        userRequestJSON = JSON.stringify(userRequestJSON)
+        let xhttp = new XMLHttpRequest()
+        xhttp.onreadystatechange= ()=>{
+            if(xhttp.readyState == 4 && xhttp.status == 200){
+                //then do nothing because it is done lol
+                let responseObj = JSON.parse(xhttp.responseText)
+                console.log(responseObj.text)
+            }
+            
+        }
+        xhttp.open("POST", "addDefinition")
+        xhttp.send(userRequestJSON)
     }
     
 }

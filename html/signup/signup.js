@@ -70,8 +70,8 @@ function checkValidity(username, password){
     let userRequestJSON;
     userRequestJSON = {
         text: "please give me me data because hello hi this is I "+username,
-        username: username,
-        password: password,
+        userEmail: username,
+        userPassword: password,
     };
     userRequestJSON = JSON.stringify(userRequestJSON)
     let xhttp = new XMLHttpRequest()
@@ -79,7 +79,8 @@ function checkValidity(username, password){
         if(xhttp.readyState == 4 && xhttp.status == 200){
             //then do nothing because it is done lol
             let responseObj = JSON.parse(xhttp.responseText)
-            responseToUser(responseObj.isValid)
+            responseToUser(responseObj["isValid"])
+            console.log(responseObj["isValid"])
             console.log("this place is reached")
         }
         
@@ -95,19 +96,23 @@ function checkValidity(username, password){
 function responseToUser(isValid){
     console.log("this place is reached")
     if(isValid){
-        let xhr = new XMLHttpRequest();
-        xhr.open("GET", `/main/index.html`);
+        location.href = window.location.protocol + "//" + window.location.host + "/index.html"
+            
+        // let xhr = new XMLHttpRequest();
+        // xhr.open("GET", `/main/index.html`);
 
-        xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log(xhr.responseText);
-            let DOM = document.querySelector("html")
-            DOM.remove()
-            document.write(xhr.responseText)
-            console.log(document.querySelector("html"))
-        }};
+        // xhr.onreadystatechange = function () {
+        // if (xhr.readyState === 4) {
+        //     console.log(xhr.responseText);
+        //     /**
+        //     let DOM = document.querySelector("html")
+        //     DOM.remove()
+        //     document.write(xhr.responseText)
+        //     console.log(document.querySelector("html"))
+        //      */
+        // }};
 
-        xhr.send();
+        // xhr.send();
         signupUser.mail = signupUsernameInput.value;
         signupUser.password = signupPasswordInput.value;
         // validityMsg.innerHTML = "do better"
@@ -115,7 +120,7 @@ function responseToUser(isValid){
     }
     else{
         signupValidityMsg.innerHTML = "this user already exists please create a new login"
-        console.log(passwordMsg)
+        //console.log(passwordMsg)
     }
 }
 

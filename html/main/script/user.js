@@ -9,9 +9,7 @@
 
 let user = {
     loggedIn: false,
-    userID: null,
-    folderID: null,
-    user: "user",
+    userEmail: "user",
     password: null,
     currDir: "main",
     folderNames: [],
