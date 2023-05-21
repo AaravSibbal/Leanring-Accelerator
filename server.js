@@ -2,13 +2,13 @@
 
 const http = require('http') //need to http
 const fs = require('fs') //need to read static files
-const url = require('url')  //to parse url strings
-const { json } = require('express')
+const url = require('url')  //to parse url stringsimport * as db from "./serverRoutes.js" 
+const db = require("./serverRoutes.js")
 
 const loginURLS = ['/login.js','/loginHandler.js','/login.css','/loginUser.js','login.html' ]
 const signupURLS = ['/signup.js','/signupHandler.js','/signup.css','/signupUser.js','signup.html' ]
 
-const mainURLS = ["/script/index.js","/script/eventHandler.js","/script/mediaPlayer.js","/script/textToSpeech.js","/script/user.js","/style.css"]
+const mainURLS = ["/index.html","/script/index.js","/script/eventHandler.js","/script/mediaPlayer.js","/script/textToSpeech.js","/script/user.js","/style.css"]
 const ROOT_DIR = 'html' //dir to serve static files from
 
 const MIME_TYPES = {
@@ -85,9 +85,8 @@ http.createServer(function (request,response){
         // recieved data object: username, password
         if(request.method === "POST" && urlObj.pathname === "/checkUser"){
             dataObj = JSON.parse(recievedData)
-
-            //TODO: add a check here for if we have the data
-            returnObj = {isValid: true};// chenge the true to a function call to the server
+    
+            returnObj = {isValid: db.doesUserExist};// chenge the true to a function call to the server
             console.log("this is responseJSON: "+returnObj)
             response.writeHead(200, {
                 "Content-type": MIME_TYPES["json"]
@@ -98,10 +97,10 @@ http.createServer(function (request,response){
 
         if(request.method === "POST" && urlObj.pathname === "/createUser"){
             dataObj = JSON.parse(recievedData)
+            console.log(dataObj.userEmail, dataObj.userPassword)
+            returnObj =  {"isValid": db.addUser(dataObj.userEmail, dataObj.userPassword)};// chenge the true to a function call to the server
+            console.log("this is responseJSON: "+returnObj.toString())
 
-            //TODO: add a check here for if we have the data
-            returnObj = {isValid: true};// chenge the true to a function call to the server
-            console.log("this is responseJSON: "+returnObj)
             response.writeHead(200, {
                 "Content-type": MIME_TYPES["json"]
             })
@@ -112,8 +111,21 @@ http.createServer(function (request,response){
             dataObj = JSON.parse(recievedData)
             let userData = {}
             userData = Object.assign(dataObj, userData)
+            db.removeFolder(userData.userEmail, userData.folderName)
+            returnObj = "we are going to delete the folder now"
+            
+            console.log("this is responseJSON: "+returnObj)
+            response.writeHead(200, {
+                "Content-type": MIME_TYPES["json"]
+            })
+            response.end(JSON.stringify(returnObj));
+        }
+        if(request.method ==="POST" && urlObj.pathname === "/addFolder"){
+            dataObj = JSON.parse(recievedData)
+            let userData = {}
+            userData = Object.assign(dataObj, userData)
             //TODO: please make actually remove it from the database and add the DeleteFolderFromDB()
-
+            db.addFolder(userData.userEmail, userData.folderName)
             returnObj = "we are going to delete the folder now"
             
             console.log("this is responseJSON: "+returnObj)
@@ -123,7 +135,38 @@ http.createServer(function (request,response){
             response.end(JSON.stringify(returnObj));
         }
 
+        if(request.method ==="POST" && urlObj.pathname === "/deleteDefinition"){
+            dataObj = JSON.parse(recievedData)
+            let userData = {}
+            userData = Object.assign(dataObj, userData)
+            //TODO: please make actually remove it from the database and add the DeleteFolderFromDB()
+            db.removeDefinitions(userData.userEmail, userData.folderName, userData.definition)
+            returnObj = {text: "we are going to delete the definition now"}
+            
+            console.log("this is responseJSON: "+returnObj)
+            response.writeHead(200, {
+                "Content-type": MIME_TYPES["json"]
+            })
+            response.end(JSON.stringify(returnObj));
+        }
+        if(request.method ==="POST" && urlObj.pathname === "/addDefinition"){
+            dataObj = JSON.parse(recievedData)
+            let userData = {}
+            userData = Object.assign(dataObj, userData)
+            //TODO: please make actually remove it from the database and add the DeleteFolderFromDB()
+            db.addDefinition(userData.userEmail, userData.folderName, userData.definition)
+            
+            returnObj = {text: "we are going to delete the definition now"}
+            
+            console.log("this is responseJSON: "+returnObj)
+            response.writeHead(200, {
+                "Content-type": MIME_TYPES["json"]
+            })
+            response.end(JSON.stringify(returnObj));
+        }
+
         if(request.method === "GET"){
+
             let filePath = ROOT_DIR + urlObj.pathname
             if(loginURLS.includes(urlObj.pathname)){
                 filePath = ROOT_DIR + "/login" + urlObj.pathname

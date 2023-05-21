@@ -50,10 +50,12 @@ function responseToUser(isValid){
         xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             console.log(xhr.responseText);
-            let DOM = document.querySelector("html")
-            DOM.remove()
-            document.write(xhr.responseText)
-            console.log(document.querySelector("html"))
+            location.href = window.location.protocol + "//" + window.location.host + "/index.html"
+            
+            // let DOM = document.querySelector("html")
+            // DOM.remove()
+            // document.write(xhr.responseText)
+            // console.log(document.querySelector("html"))
         }};
 
         xhr.send();
